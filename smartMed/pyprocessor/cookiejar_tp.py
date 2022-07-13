@@ -27,9 +27,9 @@ from sawtooth_sdk.processor.exceptions import InternalError
 from sawtooth_sdk.processor.core import TransactionProcessor
 
 # hard-coded for simplicity (otherwise get the URL from the args in main):
-#DEFAULT_URL = 'tcp://localhost:4004'
+DEFAULT_URL = 'tcp://localhost:4004'
 # For Docker:
-DEFAULT_URL = 'tcp://validator:4004'
+#DEFAULT_URL = 'tcp://validator:4004'
 
 LOGGER = logging.getLogger(__name__)
 
