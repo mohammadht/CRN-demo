@@ -32,9 +32,9 @@ from sawtooth_sdk.protobuf.validator_pb2 import Message
 
 # hard-coded for simplicity (otherwise get the URL from the args in main):
 # For localhost access:
-#DEFAULT_VALIDATOR_URL = 'tcp://localhost:4004'
+DEFAULT_VALIDATOR_URL = 'tcp://localhost:4004'
 # For Docker access:
-DEFAULT_VALIDATOR_URL = 'tcp://validator:4004'
+#DEFAULT_VALIDATOR_URL = 'tcp://validator:4004'
 # Calculated from the 1st 6 characters of SHA-512("cookiejar"):
 COOKIEJAR_TP_ADDRESS_PREFIX = 'a4d219'
 
