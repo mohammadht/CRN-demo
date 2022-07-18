@@ -44,7 +44,7 @@ def _hash(data):
 class CookieJarClient(object):
     '''Client Cookie Jar class
 
-    Supports "bake", "eat", and "count" functions.
+    Supports "find", "bake", "eat", and "count" functions.
     '''
 
     def __init__(self, base_url, key_file=None):
@@ -86,15 +86,19 @@ class CookieJarClient(object):
     # 2. Send to REST API
     def bake(self, amount):
         '''Bake amount cookies for the cookie jar.'''
-        return self._wrap_and_send("bake", amount, wait=10)
+        return self._wrap_and_send("bake", amount, None, wait=10)
 
     def eat(self, amount):
         '''Eat amount cookies from the cookie jar.'''
         try:
-            ret_amount = self._wrap_and_send("eat", amount, wait=10)
+            ret_amount = self._wrap_and_send("eat", amount, None, wait=10)
         except Exception:
             raise Exception('Encountered an error during eat')
         return ret_amount
+
+    def find(self, color, dc):
+        '''Bake amount cookies for the cookie jar.'''
+        return self._wrap_and_send("find", color, dc, wait=10)
 
     def count(self):
         '''Count the number of cookies in the cookie jar.'''
@@ -116,7 +120,7 @@ class CookieJarClient(object):
         '''Send a REST command to the Validator via the REST API.
 
            Called by count() &  _wrap_and_send().
-           The latter caller is made on the behalf of bake() & eat().
+           The latter caller is made on the behalf of find(), bake() & eat().
         '''
         url = "{}/{}".format(self._base_url, suffix)
         print("URL to send to REST API is {}".format(url))
@@ -165,15 +169,18 @@ class CookieJarClient(object):
             return result
 
 
-    def _wrap_and_send(self, action, amount, wait=None):
+    def _wrap_and_send(self, action, amount, dc, wait=None):
         '''Create a transaction, then wrap it in a batch.
 
            Even single transactions must be wrapped into a batch.
-           Called by bake() and eat().
+           Called by find(), bake() and eat().
         '''
 
         # Generate a CSV UTF-8 encoded string as the payload.
-        raw_payload = ",".join([action, str(amount)])
+        if action == "find":
+            raw_payload = ",".join([action, amount, dc])
+        else:    
+            raw_payload = ",".join([action, str(amount)])
         payload = raw_payload.encode() # Convert Unicode to bytes
 
         # Construct the address where we'll store our state.

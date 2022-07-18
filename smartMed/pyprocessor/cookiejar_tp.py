@@ -56,7 +56,7 @@ class CookieJarTransactionHandler(TransactionHandler):
     Transaction Processor class for the cookiejar Transaction Family.
 
     This TP communicates with the Validator using the accept/get/set functions.
-    This implements functions to "bake" or "eat" cookies in a cookie jar.
+    This implements functions to "find", "bake" or "eat" cookies in a cookie jar.
     '''
     def __init__(self, namespace_prefix):
         '''Initialize the transaction handler class.
@@ -94,6 +94,7 @@ class CookieJarTransactionHandler(TransactionHandler):
         payload_list = transaction.payload.decode().split(",")
         action = payload_list[0]
         amount = payload_list[1]
+        dc = payload_list[2]
 
         # Get the signer's public key, sent in the header from the client.
         from_key = header.signer_public_key
@@ -105,6 +106,8 @@ class CookieJarTransactionHandler(TransactionHandler):
             self._make_bake(context, amount, from_key)
         elif action == "eat":
             self._make_eat(context, amount, from_key)
+        elif action == "find":
+            self._make_find(context, amount, dc, from_key)    
         elif action == "clear":
             self._empty_cookie_jar(context, amount, from_key)
         else:
@@ -172,6 +175,21 @@ class CookieJarTransactionHandler(TransactionHandler):
         context.add_event(
             event_type="cookiejar/eat",
             attributes=[("cookies-ate", amount)])
+
+    @classmethod
+    def _make_find(cls, context, amount, dc, from_key):
+        '''find associated dsc from a specific dc based on the color tag.'''
+
+        fr = open("dslist.txt","r")
+        fw = open("ds-color.txt","w")
+        lines = fr.readlines()
+        for line in lines:
+            data = line.split(",")
+            if data[2] == "amount":
+                fw.write(data[1])
+                fw.write("\n")
+        fr.close()
+        fw.close()
 
     @classmethod
     def _empty_cookie_jar(cls, context, amount, from_key):

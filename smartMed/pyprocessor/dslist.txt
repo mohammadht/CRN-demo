@@ -1,0 +1,3 @@
+0012219339,hash1,red
+0123456789,hash2,green
+9876543210,hash3,blue

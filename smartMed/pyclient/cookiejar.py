@@ -80,6 +80,15 @@ def create_parser(prog_name):
     bake_subparser.add_argument('amount',
                                 type=int,
                                 help='the number of cookies to bake')
+    find_subparser = subparsers.add_parser('find',
+                                           help='find the list of DSs with color tag',
+                                           parents=[parent_parser])
+    find_subparser.add_argument('color',
+                                type=str,
+                                help='the color to be found')
+    find_subparser.add_argument('--dc',
+                                type=str,
+                                help='the username of the data controller')                                                            
     eat_subparser = subparsers.add_parser('eat',
                                           help='eat some cookies',
                                           parents=[parent_parser])
@@ -109,6 +118,13 @@ def do_bake(args):
     client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
     response = client.bake(args.amount)
     print("Bake Response: {}".format(response))
+
+def do_find(args):
+    '''Subcommand to find a list of DSs with associated color. Calls client class to do the finding.'''
+    privkeyfile = _get_private_keyfile(KEY_NAME)
+    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
+    response = client.find(args.color,args.dc)
+    print("Find Response: {}".format(response))    
 
 def do_eat(args):
     '''Subcommand to eat cookies.  Calls client class to do the eating.'''
@@ -149,6 +165,8 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
             do_bake(args)
         elif args.command == 'eat':
             do_eat(args)
+        elif args.command == 'find':
+            do_find(args)    
         elif args.command == 'count':
             do_count()
         elif args.command == 'clear':
