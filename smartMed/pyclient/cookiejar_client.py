@@ -179,8 +179,10 @@ class CookieJarClient(object):
         # Generate a CSV UTF-8 encoded string as the payload.
         if action == "find":
             raw_payload = ",".join([action, amount])
-        else:    
+        elif action == "bake":    
             raw_payload = ",".join([action, str(amount)])
+        elif action == "eat":    
+            raw_payload = ",".join([action, str(amount)])    
         payload = raw_payload.encode() # Convert Unicode to bytes
 
         # Construct the address where we'll store our state.
