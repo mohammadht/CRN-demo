@@ -86,9 +86,9 @@ def create_parser(prog_name):
     find_subparser.add_argument('color',
                                 type=str,
                                 help='the color to be found')
-    find_subparser.add_argument('--dc',
-                                type=str,
-                                help='the username of the data controller')                                                            
+#    find_subparser.add_argument('--dc',
+#                                type=str,
+#                                help='the username of the data controller')                                                            
     eat_subparser = subparsers.add_parser('eat',
                                           help='eat some cookies',
                                           parents=[parent_parser])
