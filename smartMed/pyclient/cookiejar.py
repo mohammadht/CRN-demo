@@ -123,7 +123,7 @@ def do_find(args):
     '''Subcommand to find a list of DSs with associated color. Calls client class to do the finding.'''
     privkeyfile = _get_private_keyfile(KEY_NAME)
     client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
-    response = client.find(args.color,args.dc)
+    response = client.find(args.color)
     print("Find Response: {}".format(response))    
 
 def do_eat(args):

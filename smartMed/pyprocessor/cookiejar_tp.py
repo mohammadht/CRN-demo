@@ -94,7 +94,7 @@ class CookieJarTransactionHandler(TransactionHandler):
         payload_list = transaction.payload.decode().split(",")
         action = payload_list[0]
         amount = payload_list[1]
-        dc = payload_list[2]
+    #    dc = payload_list[2]
 
         # Get the signer's public key, sent in the header from the client.
         from_key = header.signer_public_key
@@ -107,7 +107,7 @@ class CookieJarTransactionHandler(TransactionHandler):
         elif action == "eat":
             self._make_eat(context, amount, from_key)
         elif action == "find":
-            self._make_find(context, amount, dc, from_key)    
+            self._make_find(context, amount, from_key)    
         elif action == "clear":
             self._empty_cookie_jar(context, amount, from_key)
         else:

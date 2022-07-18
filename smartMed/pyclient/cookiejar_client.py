@@ -86,19 +86,19 @@ class CookieJarClient(object):
     # 2. Send to REST API
     def bake(self, amount):
         '''Bake amount cookies for the cookie jar.'''
-        return self._wrap_and_send("bake", amount, None, wait=10)
+        return self._wrap_and_send("bake", amount, wait=10)
 
     def eat(self, amount):
         '''Eat amount cookies from the cookie jar.'''
         try:
-            ret_amount = self._wrap_and_send("eat", amount, None, wait=10)
+            ret_amount = self._wrap_and_send("eat", amount, wait=10)
         except Exception:
             raise Exception('Encountered an error during eat')
         return ret_amount
 
     def find(self, color, dc):
         '''Bake amount cookies for the cookie jar.'''
-        return self._wrap_and_send("find", color, dc, wait=10)
+        return self._wrap_and_send("find", color, wait=10)
 
     def count(self):
         '''Count the number of cookies in the cookie jar.'''
@@ -169,7 +169,7 @@ class CookieJarClient(object):
             return result
 
 
-    def _wrap_and_send(self, action, amount, dc, wait=None):
+    def _wrap_and_send(self, action, amount, wait=None):
         '''Create a transaction, then wrap it in a batch.
 
            Even single transactions must be wrapped into a batch.
@@ -178,7 +178,7 @@ class CookieJarClient(object):
 
         # Generate a CSV UTF-8 encoded string as the payload.
         if action == "find":
-            raw_payload = ",".join([action, amount, dc])
+            raw_payload = ",".join([action, amount])
         else:    
             raw_payload = ",".join([action, str(amount)])
         payload = raw_payload.encode() # Convert Unicode to bytes
