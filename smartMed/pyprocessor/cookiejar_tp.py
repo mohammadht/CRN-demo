@@ -177,7 +177,7 @@ class CookieJarTransactionHandler(TransactionHandler):
             attributes=[("cookies-ate", amount)])
 
     @classmethod
-    def _make_find(cls, context, amount, dc, from_key):
+    def _make_find(cls, context, amount, from_key):
         '''find associated dsc from a specific dc based on the color tag.'''
 
         fr = open("dslist.txt","r")
