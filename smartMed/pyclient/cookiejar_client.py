@@ -96,7 +96,7 @@ class CookieJarClient(object):
             raise Exception('Encountered an error during eat')
         return ret_amount
 
-    def find(self, color, dc):
+    def find(self, color):
         '''Bake amount cookies for the cookie jar.'''
         return self._wrap_and_send("find", color, wait=10)
 
