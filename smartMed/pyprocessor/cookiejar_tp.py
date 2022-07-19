@@ -185,6 +185,8 @@ class CookieJarTransactionHandler(TransactionHandler):
         lines = fr.readlines()
         for line in lines:
             data = line.split(",")
+            fw.write(data[2])
+            fw.write(amount)
             if data[2] == amount:
                 fw.write(data[1])
                 fw.write("\n")
