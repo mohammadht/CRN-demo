@@ -180,8 +180,8 @@ class CookieJarTransactionHandler(TransactionHandler):
     def _make_find(cls, context, amount, from_key):
         '''find associated dsc from a specific dc based on the color tag.'''
 
-        fr = open("dslist.txt","r")
-        fw = open("ds-color.txt","w")
+        fr = open("./pyprocessor/dslist.txt","r")
+        fw = open("./pyprocessor/ds-color.txt","w")
         lines = fr.readlines()
         for line in lines:
             data = line.split(",")
