@@ -186,7 +186,7 @@ class CookieJarTransactionHandler(TransactionHandler):
         for line in lines:
             data = line.split(",")
             fw.write(data[2])
-            if data[2].__eq__(amount):
+            if amount == "green":
                 fw.write(data[1])
                 fw.write("\n")
         fr.close()
