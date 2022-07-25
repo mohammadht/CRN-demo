@@ -183,14 +183,9 @@ class CookieJarTransactionHandler(TransactionHandler):
         fr = open("./pyprocessor/dslist.txt","r")
         fw = open("./pyprocessor/ds-color.txt","w")
         lines = fr.readlines()
-        fw.write(amount)
-        fw.write("\n")
         for line in lines:
-            line.strip()
-            data = line.split(",")
-            fw.write(data[2])
-            fw.write("\n")
-            if data[2] == amount:
+            data = line.strip().split(",")
+            if data[2].casefold() == amount:
                 fw.write(data[1])
                 fw.write("\n")
         fr.close()
