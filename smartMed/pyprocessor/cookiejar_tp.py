@@ -191,6 +191,7 @@ class CookieJarTransactionHandler(TransactionHandler):
         fr.close()
         fw.close()
 
+
     @classmethod
     def _empty_cookie_jar(cls, context, amount, from_key):
         cookie_jar_address = _get_cookiejar_address(from_key)

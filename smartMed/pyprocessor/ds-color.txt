@@ -1,7 +1,2 @@
-green
-red
-
-green
-
-blue
-
+hash2
+hash4
