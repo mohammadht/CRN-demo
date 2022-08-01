@@ -50,7 +50,7 @@ def _get_cookiejar_address(from_key,query):
     plus the result of the hash SHA-512(cookiejar public key).
     '''
     return _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
-                 _hash(from_key.encode('utf-8'))[0:64] + _hash(query.encode('utf-8'))[0:32]
+                 _hash(from_key.encode('utf-8'))[0:32] + _hash(query.encode('utf-8'))[0:32]
 
 
 class CookieJarTransactionHandler(TransactionHandler):
