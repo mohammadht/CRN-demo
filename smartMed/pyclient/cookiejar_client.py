@@ -44,7 +44,7 @@ def _hash(data):
 class CookieJarClient(object):
     '''Client Cookie Jar class
 
-    Supports "find", "bake", "eat", and "count" functions.
+    Supports "find", "sendlist", "bake", "eat", and "count" functions.
     '''
 
     def __init__(self, base_url, key_file=None):
@@ -97,7 +97,7 @@ class CookieJarClient(object):
         return ret_amount
 
     def find(self, color):
-        '''Bake amount cookies for the cookie jar.'''
+        '''find associated DSs with the color tag.'''
         return self._wrap_and_send("find", color, wait=10)
 
     def count(self):
@@ -180,7 +180,7 @@ class CookieJarClient(object):
         if action == "find":
             raw_payload = ",".join([action, amount])
         elif action == "bake":    
-            raw_payload = ",".join([action, str(amount)])
+            raw_payload = ",".join([action, str(amount)])    
         elif action == "eat":    
             raw_payload = ",".join([action, str(amount)])    
         payload = raw_payload.encode() # Convert Unicode to bytes

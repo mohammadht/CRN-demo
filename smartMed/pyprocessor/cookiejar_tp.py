@@ -20,6 +20,8 @@ import traceback
 import sys
 import hashlib
 import logging
+import random
+import string
 
 from sawtooth_sdk.processor.handler import TransactionHandler
 from sawtooth_sdk.processor.exceptions import InvalidTransaction
@@ -40,7 +42,7 @@ def _hash(data):
     '''Compute the SHA-512 hash and return the result as hex characters.'''
     return hashlib.sha512(data).hexdigest()
 
-def _get_cookiejar_address(from_key):
+def _get_cookiejar_address(from_key,query):
     '''
     Return the address of a cookiejar object from the cookiejar TF.
 
@@ -48,7 +50,7 @@ def _get_cookiejar_address(from_key):
     plus the result of the hash SHA-512(cookiejar public key).
     '''
     return _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
-                 _hash(from_key.encode('utf-8'))[0:64]
+                 _hash(from_key.encode('utf-8'))[0:64] + _hash(query.encode('utf-8'))[0:32]
 
 
 class CookieJarTransactionHandler(TransactionHandler):
@@ -107,7 +109,7 @@ class CookieJarTransactionHandler(TransactionHandler):
         elif action == "eat":
             self._make_eat(context, amount, from_key)
         elif action == "find":
-            self._make_find(context, amount, from_key)    
+            self._make_find(context, amount, from_key)        
         elif action == "clear":
             self._empty_cookie_jar(context, amount, from_key)
         else:
@@ -179,18 +181,21 @@ class CookieJarTransactionHandler(TransactionHandler):
     @classmethod
     def _make_find(cls, context, amount, from_key):
         '''find associated dsc from a specific dc based on the color tag.'''
-
+        queryID = ''.join(random.choice(string.printable) for i in range(8))
+        query_address = _get_cookiejar_address(from_key,queryID)
+        LOGGER.info('Got the key %s and the query address %s.',
+                    from_key, query_address)
         fr = open("./pyprocessor/dslist.txt","r")
         fw = open("./pyprocessor/ds-color.txt","w")
         lines = fr.readlines()
         for line in lines:
             data = line.strip().split(",")
             if data[2].casefold() == amount:
+                fw.write(query_address)
                 fw.write(data[1])
                 fw.write("\n")
         fr.close()
         fw.close()
-
 
     @classmethod
     def _empty_cookie_jar(cls, context, amount, from_key):
