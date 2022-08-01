@@ -118,7 +118,7 @@ class CookieJarTransactionHandler(TransactionHandler):
     @classmethod
     def _make_bake(cls, context, amount, from_key):
         '''Bake (add) "amount" cookies.'''
-        cookiejar_address = _get_cookiejar_address(from_key)
+        cookiejar_address = _get_cookiejar_address(from_key,"bake address")
         LOGGER.info('Got the key %s and the cookiejar address %s.',
                     from_key, cookiejar_address)
         state_entries = context.get_state([cookiejar_address])
