@@ -85,7 +85,10 @@ def create_parser(prog_name):
                                            parents=[parent_parser])                                           
     find_subparser.add_argument('color',
                                 type=str,
-                                help='the color to be found')                                                      
+                                help='the color to be found')
+    find_subparser.add_argument('--qid',
+                               type=int,
+                               help='query id of the request')                                                                                  
     eat_subparser = subparsers.add_parser('eat',
                                           help='eat some cookies',
                                           parents=[parent_parser])
@@ -120,7 +123,7 @@ def do_find(args):
     '''Subcommand to find a list of DSs with associated color. Calls client class to do the finding.'''
     privkeyfile = _get_private_keyfile(KEY_NAME)
     client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
-    response = client.find(args.color)
+    response = client.find(args.color,args.qid)
     print("Find Response: {}".format(response))       
 
 def do_eat(args):

@@ -96,7 +96,7 @@ class CookieJarTransactionHandler(TransactionHandler):
         payload_list = transaction.payload.decode().split(",")
         action = payload_list[0]
         amount = payload_list[1]
-    #    dc = payload_list[2]
+        qid = payload_list[2]
 
         # Get the signer's public key, sent in the header from the client.
         from_key = header.signer_public_key
@@ -104,12 +104,13 @@ class CookieJarTransactionHandler(TransactionHandler):
         # Perform the action.
         LOGGER.info("Action = %s.", action)
         LOGGER.info("Amount = %s.", amount)
+        LOGGER.info("Query ID = %s.", qid)
         if action == "bake":
             self._make_bake(context, amount, from_key)
         elif action == "eat":
             self._make_eat(context, amount, from_key)
         elif action == "find":
-            self._make_find(context, amount, from_key)        
+            self._make_find(context, amount, qid, from_key)        
         elif action == "clear":
             self._empty_cookie_jar(context, amount, from_key)
         else:
@@ -118,7 +119,7 @@ class CookieJarTransactionHandler(TransactionHandler):
     @classmethod
     def _make_bake(cls, context, amount, from_key):
         '''Bake (add) "amount" cookies.'''
-        cookiejar_address = _get_cookiejar_address(from_key,"bake address")
+        cookiejar_address = _get_cookiejar_address(from_key,"bake_add")
         LOGGER.info('Got the key %s and the cookiejar address %s.',
                     from_key, cookiejar_address)
         state_entries = context.get_state([cookiejar_address])
@@ -179,23 +180,25 @@ class CookieJarTransactionHandler(TransactionHandler):
             attributes=[("cookies-ate", amount)])
 
     @classmethod
-    def _make_find(cls, context, amount, from_key):
+    def _make_find(cls, context, amount, qid, from_key):
         '''find associated dsc from a specific dc based on the color tag.'''
-        queryID = ''.join(random.choice(string.printable) for i in range(8))
-        query_address = _get_cookiejar_address(from_key,queryID)
+        query_address = _get_cookiejar_address(from_key,qid)
         LOGGER.info('Got the key %s and the query address %s.',
                     from_key, query_address)
+        query_result = [qid]            
         fr = open("./pyprocessor/dslist.txt","r")
         fw = open("./pyprocessor/ds-color.txt","w")
         lines = fr.readlines()
         for line in lines:
             data = line.strip().split(",")
             if data[2].casefold() == amount:
-                fw.write(query_address)
+                query_result.append(data[1])
                 fw.write(data[1])
                 fw.write("\n")
         fr.close()
         fw.close()
+        state_data = str(query_result).encode('utf-8')
+        addresses = context.set_state({query_address: state_data})
 
     @classmethod
     def _empty_cookie_jar(cls, context, amount, from_key):

@@ -77,8 +77,14 @@ class CookieJarClient(object):
         self._public_key = self._signer.get_public_key().as_hex()
 
         # Address is 6-char TF prefix + hash of "mycookiejar"'s public key
-        self._address = _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
-            _hash(self._public_key.encode('utf-8'))[0:64]
+
+    def _get_prefix(self):
+        return _hash(FAMILY_NAME.encode('utf-8'))[0:6]
+
+        # Address is 6-char TF prefix + hash of userid + hash of psid    
+    def _get_address(self, id):
+        return self._get_prefix() + \
+            _hash(self._public_key.encode('utf-8'))[0:32] + _hash(id.encode('utf-8'))[0:32]    
 
     # For each CLI command, add a method to:
     # 1. Do any additional handling, if required
@@ -86,19 +92,19 @@ class CookieJarClient(object):
     # 2. Send to REST API
     def bake(self, amount):
         '''Bake amount cookies for the cookie jar.'''
-        return self._wrap_and_send("bake", amount, wait=10)
+        return self._wrap_and_send("bake", amount, None, wait=10)
 
     def eat(self, amount):
         '''Eat amount cookies from the cookie jar.'''
         try:
-            ret_amount = self._wrap_and_send("eat", amount, wait=10)
+            ret_amount = self._wrap_and_send("eat", amount, None, wait=10)
         except Exception:
             raise Exception('Encountered an error during eat')
         return ret_amount
 
-    def find(self, color):
+    def find(self, color, qid):
         '''find associated DSs with the color tag.'''
-        return self._wrap_and_send("find", color, wait=10)
+        return self._wrap_and_send("find", color, qid, wait=10)
 
     def count(self):
         '''Count the number of cookies in the cookie jar.'''
@@ -169,7 +175,7 @@ class CookieJarClient(object):
             return result
 
 
-    def _wrap_and_send(self, action, amount, wait=None):
+    def _wrap_and_send(self, action, amount, qid, wait=None):
         '''Create a transaction, then wrap it in a batch.
 
            Even single transactions must be wrapped into a batch.
@@ -178,24 +184,25 @@ class CookieJarClient(object):
 
         # Generate a CSV UTF-8 encoded string as the payload.
         if action == "find":
-            raw_payload = ",".join([action, amount])
+            raw_payload = ",".join([action, amount, str(qid)])
+            address == self._get_address(str(qid))
         elif action == "bake":    
-            raw_payload = ",".join([action, str(amount)])    
+            raw_payload = ",".join([action, str(amount)])
+            address = self._get_address("bake_add")    
         elif action == "eat":    
             raw_payload = ",".join([action, str(amount)])    
         payload = raw_payload.encode() # Convert Unicode to bytes
 
         # Construct the address where we'll store our state.
-        # We just have one input and output address (the same one).
-        input_and_output_address_list = [self._address]
+        # We just have one input and output address (the same one).        
 
         # Create a TransactionHeader.
         header = TransactionHeader(
             signer_public_key=self._public_key,
             family_name=FAMILY_NAME,
             family_version="1.0",
-            inputs=input_and_output_address_list,
-            outputs=input_and_output_address_list,
+            inputs=[address],
+            outputs=[address],
             dependencies=[],
             payload_sha512=_hash(payload),
             batcher_public_key=self._public_key,
