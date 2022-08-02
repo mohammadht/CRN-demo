@@ -22,6 +22,7 @@ import hashlib
 import logging
 import random
 import string
+import os.path
 
 from sawtooth_sdk.processor.handler import TransactionHandler
 from sawtooth_sdk.processor.exceptions import InvalidTransaction
@@ -186,18 +187,19 @@ class CookieJarTransactionHandler(TransactionHandler):
         query_address = _get_cookiejar_address(from_key,qid)
         LOGGER.info('Got the key %s and the query address %s.',
                     from_key, query_address)
-        query_result = [qid]            
-        fr = open("./pyprocessor/dslist.txt","r")
-        fw = open("./pyprocessor/ds-color.txt","w")
-        lines = fr.readlines()
-        for line in lines:
-            data = line.strip().split(",")
-            if data[2].casefold() == amount:
-                query_result.append(data[1])
-                fw.write(data[1])
-                fw.write("\n")
-        fr.close()
-        fw.close()
+        query_result = [qid]
+        if os.path.isfile("./pyprocessor/dslist.txt"):           
+            fr = open("./pyprocessor/dslist.txt","r")
+            fw = open("./pyprocessor/ds-color.txt","w")
+            lines = fr.readlines()
+            for line in lines:
+                data = line.strip().split(",")
+                if data[2].casefold() == amount:
+                    query_result.append(data[1])
+                    fw.write(data[1])
+                    fw.write("\n")
+            fr.close()
+            fw.close()
         state_data = str(query_result).encode('utf-8')
         addresses = context.set_state({query_address: state_data})
 
