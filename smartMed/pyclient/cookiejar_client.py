@@ -108,7 +108,8 @@ class CookieJarClient(object):
 
     def count(self):
         '''Count the number of cookies in the cookie jar.'''
-        result = self._send_to_rest_api("state/{}".format(self._address))
+        address = _get_address("bake_add")
+        result = self._send_to_rest_api("state/{}".format(address))
         try:
             return base64.b64decode(yaml.safe_load(result)["data"])
         except BaseException:
