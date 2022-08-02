@@ -96,7 +96,8 @@ class CookieJarTransactionHandler(TransactionHandler):
         payload_list = transaction.payload.decode().split(",")
         action = payload_list[0]
         amount = payload_list[1]
-        qid = payload_list[2]
+        if action == "find":
+            qid = payload_list[2]
 
         # Get the signer's public key, sent in the header from the client.
         from_key = header.signer_public_key
