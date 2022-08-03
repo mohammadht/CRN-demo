@@ -106,6 +106,22 @@ class CookieJarClient(object):
         '''find associated DSs with the color tag.'''
         return self._wrap_and_send("find", color, qid, wait=10)
 
+    def list(self):
+        addr_prefix = self._get_prefix()
+
+        result = self._send_to_rest_api(
+            "state?address={}".format(addr_prefix))
+
+        try:
+            encoded_entries = yaml.safe_load(result)["data"]
+
+            return [
+                base64.b64decode(entry["data"]) for entry in encoded_entries
+            ]
+
+        except BaseException:
+            return None    
+
     def count(self):
         '''Count the number of cookies in the cookie jar.'''
         address = self._get_address("bake_add")
