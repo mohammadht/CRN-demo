@@ -142,7 +142,13 @@ def do_list():
         count = 0;
         for tx_data in query_list:
             count = count + 1;
-            print(str(count) + ") The registered query: {}".format(tx_data))
+            qid, ds1, ds2, ds3, ds4, ds5 = tx_data
+            print(str(count) + ") Query ID:"+ qid, \
+                "| DS1:"+ ds1, \
+                "| DS2:"+ ds2, \
+                "| DS3:"+ ds3, \
+                "| DS4:"+ ds4, \
+                "| DS5:"+ ds5)
     else:
         raise Exception("Transaction data not found")            
 

@@ -187,16 +187,25 @@ class CookieJarTransactionHandler(TransactionHandler):
         query_address = _get_cookiejar_address(from_key,qid)
         LOGGER.info('Got the key %s and the query address %s.',
                     from_key, query_address)
-        query_result = [qid]
+        query_result = [qid,"n/a","n/a","n/a","n/a","n/a"]
         fr = open("./pyprocessor/dslist.txt","r")
         fw = open("./pyprocessor/ds-color.txt","w")
         lines = fr.readlines()
         for line in lines:
             data = line.strip().split(",")
             if data[2].casefold() == amount:
-                query_result.append(data[1])
-                fw.write(data[1])
-                fw.write("\n")
+                if data[1] == "DS1Pubkey":
+                    query_result[1] = "waiting"                   
+                if data[1] == "DS2Pubkey":
+                    query_result[2] = "waiting"
+                if data[1] == "DS3Pubkey":
+                    query_result[3] = "waiting"
+                if data[1] == "DS4Pubkey":
+                    query_result[4] = "waiting"
+                if data[1] == "DS5Pubkey":
+                    query_result[5] = "waiting"            
+        fw.write(data[1])
+        fw.write("\n")               
         fr.close()
         fw.close()
         state_data = str(query_result).encode('utf-8')
