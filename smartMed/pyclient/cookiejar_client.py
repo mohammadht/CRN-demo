@@ -17,6 +17,7 @@ CookieJarClient class interfaces with Sawtooth through the REST API.
 It accepts input from a client CLI/GUI/BUI or other interface.
 '''
 
+from builtins import BaseException
 import hashlib
 import base64
 import random
@@ -92,19 +93,32 @@ class CookieJarClient(object):
     # 2. Send to REST API
     def bake(self, amount):
         '''Bake amount cookies for the cookie jar.'''
-        return self._wrap_and_send("bake", amount, None, wait=10)
+        return self._wrap_and_send("bake", amount, None, None, None, None, None, None, None, wait=10)
 
     def eat(self, amount):
         '''Eat amount cookies from the cookie jar.'''
         try:
-            ret_amount = self._wrap_and_send("eat", amount, None, wait=10)
+            ret_amount = self._wrap_and_send("eat", amount, None, None, None, None, None, None, None, wait=10)
         except Exception:
             raise Exception('Encountered an error during eat')
         return ret_amount
 
     def find(self, color, qid):
         '''find associated DSs with the color tag.'''
-        return self._wrap_and_send("find", color, qid, wait=10)
+        return self._wrap_and_send("find", color, qid, None, None, None, None, None, None, wait=10)
+
+    def get_query(self, qid):
+        '''Get a query registered in the ledger by its ID'''
+        address = self._get_address(str(qid))
+        result = self._send_to_rest_api("state/{}".format(address))
+        try:
+            return base64.b64decode(yaml.safe_load(result)["data"])
+        except BaseException:
+            return None    
+
+    def interested(self, dsid, qid, status, ds1, ds2, ds3, ds4, ds5):
+        '''submit if the associated DS is interested in the query or not.'''
+        return self._wrap_and_send("interested", dsid, qid, status, ds1, ds2, ds3, ds4, ds5, wait=10)    
 
     def list(self):
         addr_prefix = self._get_prefix()
@@ -192,17 +206,20 @@ class CookieJarClient(object):
             return result
 
 
-    def _wrap_and_send(self, action, amount, qid, wait=None):
+    def _wrap_and_send(self, action, amount, qid, status, ds1, ds2, ds3, ds4, ds5, wait=None):
         '''Create a transaction, then wrap it in a batch.
 
            Even single transactions must be wrapped into a batch.
-           Called by find(), bake() and eat().
+           Called by find() and interested(). 
         '''
 
         # Generate a CSV UTF-8 encoded string as the payload.
         if action == "find":
             raw_payload = ",".join([action, amount, str(qid)])
             address = self._get_address(str(qid))
+        elif action == "interested":    
+            raw_payload = ",".join([action, amount, str(qid), status, ds1, ds2, ds3, ds4, ds5])
+            address = self._get_address(str(qid))     
         elif action == "bake":    
             raw_payload = ",".join([action, str(amount)])
             address = self._get_address("bake_add")    

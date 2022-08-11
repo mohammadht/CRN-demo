@@ -91,7 +91,19 @@ def create_parser(prog_name):
                                help='query id of the request')
     list_subparser = subparsers.add_parser('list',
                                            help='display all of the query results',
-                                           parents=[parent_parser])                                                                                                              
+                                           parents=[parent_parser])
+    interested_subparser = subparsers.add_parser('interested',
+                                           help='The DS shows its interest to the query',
+                                           parents=[parent_parser])
+    interested_subparser.add_argument('--dsid',
+                                type=str,
+                                help='the ID of the DS that is going to answer the query')
+    interested_subparser.add_argument('--qid',
+                                type=int,
+                                help='the ID of the query needed to be answered')
+    interested_subparser.add_argument('status',
+                                type=str,
+                                help='YES/NO response from the DS')                                                                                                                                                                                                          
     eat_subparser = subparsers.add_parser('eat',
                                           help='eat some cookies',
                                           parents=[parent_parser])
@@ -128,6 +140,16 @@ def do_find(args):
     client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
     response = client.find(args.color,args.qid)
     print("Find Response: {}".format(response))
+
+def do_interested(args):
+    '''Subcommand to show the interest of the DS to a query. Calls client class to do the interest.'''
+    privkeyfile = _get_private_keyfile(KEY_NAME)
+    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
+    data = client.get_query(args.qid)
+    if data is not None:
+        qid, ds1, ds2, ds3, ds4, ds5 = data.decode().split(",")
+    response = client.interested(args.dsid,args.qid,args.status,ds1,ds2,ds3,ds4,ds5)
+    print("Find Response: {}".format(response))    
 
 def do_list():
     '''Subcommand to show the list of query results.  Calls client class to do the showing.'''
@@ -193,6 +215,8 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
             do_eat(args)
         elif args.command == 'find':
             do_find(args)
+        elif args.command == 'interested':
+            do_interested(args)    
         elif args.command == 'list':
             do_list()                   
         elif args.command == 'count':

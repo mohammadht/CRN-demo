@@ -97,8 +97,14 @@ class CookieJarTransactionHandler(TransactionHandler):
         payload_list = transaction.payload.decode().split(",")
         action = payload_list[0]
         amount = payload_list[1]
-        if action == "find":
-            qid = payload_list[2]
+        qid = payload_list[2]
+        if action == "interested":
+            status = payload_list[3]
+            ds1 = payload_list[4]
+            ds2 = payload_list[5]
+            ds3 = payload_list[6]
+            ds4 = payload_list[7]
+            ds5 = payload_list[8]
 
         # Get the signer's public key, sent in the header from the client.
         from_key = header.signer_public_key
@@ -112,7 +118,16 @@ class CookieJarTransactionHandler(TransactionHandler):
             self._make_eat(context, amount, from_key)
         elif action == "find":
             LOGGER.info("Query ID = %s.", qid)
-            self._make_find(context, amount, qid, from_key)        
+            self._make_find(context, amount, qid, from_key)
+        elif action == "interested":
+            LOGGER.info("Query ID = %s.", qid)
+            LOGGER.info("status = %s.", status)
+            LOGGER.info("ds1 = %s.", ds1)
+            LOGGER.info("ds2 = %s.", ds2)
+            LOGGER.info("ds3 = %s.", ds3)
+            LOGGER.info("ds4 = %s.", ds4)
+            LOGGER.info("ds5 = %s.", ds5)
+            self._make_interested(context, amount, qid, status, ds1, ds2, ds3, ds4, ds5, from_key)            
         elif action == "clear":
             self._empty_cookie_jar(context, amount, from_key)
         else:
@@ -210,6 +225,36 @@ class CookieJarTransactionHandler(TransactionHandler):
         fw.close()
         state_data = str(query_result).encode('utf-8')
         addresses = context.set_state({query_address: state_data})
+
+    def _make_interested(cls, context, amount, qid, status, ds1, ds2, ds3, ds4, ds5, from_key):
+        '''Register the interest of a DS to a query.'''
+        query_address = _get_cookiejar_address(from_key,qid)
+        LOGGER.info('Got the key %s and the cookiejar address %s.',
+                    from_key, query_address)
+        state_entries = context.get_state([query_address])
+        qid, ds1, ds2, ds3, ds4, ds5 = state_entries[0].data
+        if status == "yes":
+            status = "inetersted"
+        else:
+            status = "not interested"    
+        if amount == "ds1":
+            query_result = qid, status, ds2, ds3, ds4, ds5
+        if amount == "ds2":
+            query_result = qid, ds1, status, ds3, ds4, ds5
+        if amount == "ds3":
+            query_result = qid, ds1, ds2, status, ds4, ds5
+        if amount == "ds4":
+            query_result = qid, ds1, ds2, ds3, status, ds5
+        if amount == "ds5":
+            query_result = qid, ds1, ds2, ds3, ds4, status                
+        state_data = str(query_result).encode('utf-8')
+        addresses = context.set_state({query_address: state_data})
+
+        if len(addresses) < 1:
+            raise InternalError("State Error")
+        context.add_event(
+            event_type="cookiejar/bake",
+            attributes=[("cookies-baked", amount)])    
 
     @classmethod
     def _empty_cookie_jar(cls, context, amount, from_key):
