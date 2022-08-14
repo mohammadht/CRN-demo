@@ -103,7 +103,13 @@ def create_parser(prog_name):
                                 help='the ID of the query needed to be answered')
     interested_subparser.add_argument('status',
                                 type=str,
-                                help='YES/NO response from the DS')                                                                                                                                                                                                          
+                                help='YES/NO response from the DS')
+    delete_subparser = subparsers.add_parser('delete',
+                                          help='delete a registered query',
+                                          parents=[parent_parser])
+    delete_subparser.add_argument('qid',
+                               type=int,
+                               help='Query ID of the one that is going to be deleted')                                                                                                                                                                                                                                      
     eat_subparser = subparsers.add_parser('eat',
                                           help='eat some cookies',
                                           parents=[parent_parser])
@@ -181,6 +187,13 @@ def do_eat(args):
     response = client.eat(args.amount)
     print("Eat Response: {}".format(response))
 
+def do_delete(args):
+    '''Subcommand to delete a query.  Calls client class to do the deleting.'''
+    privkeyfile = _get_private_keyfile(KEY_NAME)
+    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
+    response = client.delete(args.qid)
+    print("delete Response: {}".format(response))    
+
 def do_count():
     '''Subcommand to count cookies.  Calls client class to do the counting.'''
     privkeyfile = _get_private_keyfile(KEY_NAME)
@@ -216,7 +229,9 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
         elif args.command == 'find':
             do_find(args)
         elif args.command == 'interested':
-            do_interested(args)    
+            do_interested(args)
+        elif args.command == 'delete':
+            do_delete(args)        
         elif args.command == 'list':
             do_list()                   
         elif args.command == 'count':

@@ -96,15 +96,20 @@ class CookieJarTransactionHandler(TransactionHandler):
         header = transaction.header
         payload_list = transaction.payload.decode().split(",")
         action = payload_list[0]
-        amount = payload_list[1]
-        qid = payload_list[2]
-        if action == "interested":
+        if action == "find":
+            amount = payload_list[1]
+            qid = payload_list[2]
+        elif action == "interested":
+            amount = payload_list[1]
+            qid = payload_list[2]
             status = payload_list[3]
             ds1 = payload_list[4]
             ds2 = payload_list[5]
             ds3 = payload_list[6]
             ds4 = payload_list[7]
             ds5 = payload_list[8]
+        elif action == "delete":
+            qid = payload_list[1]
 
         # Get the signer's public key, sent in the header from the client.
         from_key = header.signer_public_key
@@ -128,6 +133,9 @@ class CookieJarTransactionHandler(TransactionHandler):
             LOGGER.info("ds4 = %s.", ds4)
             LOGGER.info("ds5 = %s.", ds5)
             self._make_interested(context, amount, qid, status, ds1, ds2, ds3, ds4, ds5, from_key)            
+        elif action == "delete":
+            LOGGER.info("Query ID = %s.", qid)
+            self._make_delete(context, qid, from_key)
         elif action == "clear":
             self._empty_cookie_jar(context, amount, from_key)
         else:
@@ -270,6 +278,13 @@ class CookieJarTransactionHandler(TransactionHandler):
         if len(addresses) < 1:
             raise InternalError("State update Error")
         LOGGER.info("SET global state success")
+
+    @classmethod
+    def _make_delete(cls, context, qid, from_key):
+        query_address = _get_cookiejar_address(from_key,qid)
+        LOGGER.info('Got the key %s and the query address %s.',
+                    from_key, query_address)
+        context.delete_state([query_address])    
 
 def main():
     '''Entry-point function for the cookiejar Transaction Processor.'''

@@ -45,7 +45,7 @@ def _hash(data):
 class CookieJarClient(object):
     '''Client Cookie Jar class
 
-    Supports "find", "sendlist", "bake", "eat", and "count" functions.
+    Supports "find", "sendlist", "delete", "eat", and "count" functions.
     '''
 
     def __init__(self, base_url, key_file=None):
@@ -106,6 +106,11 @@ class CookieJarClient(object):
     def find(self, color, qid):
         '''find associated DSs with the color tag.'''
         return self._wrap_and_send("find", color, qid, None, None, None, None, None, None, wait=10)
+
+    def delete(self, qid):
+        '''delete a registered query.'''
+        return self._wrap_and_send("delete", None, qid, None, None, None, None, None, None, wait=10)
+
 
     def get_query(self, qid):
         '''Get a query registered in the ledger by its ID'''
@@ -219,7 +224,10 @@ class CookieJarClient(object):
             address = self._get_address(str(qid))
         elif action == "interested":    
             raw_payload = ",".join([action, amount, str(qid), status, ds1, ds2, ds3, ds4, ds5])
-            address = self._get_address(str(qid))     
+            address = self._get_address(str(qid))
+        elif action == "delete":    
+            raw_payload = ",".join([action, str(qid)])
+            address = self._get_address(str(qid))         
         elif action == "bake":    
             raw_payload = ",".join([action, str(amount)])
             address = self._get_address("bake_add")    
