@@ -116,15 +116,18 @@ class CookieJarTransactionHandler(TransactionHandler):
 
         # Perform the action.
         LOGGER.info("Action = %s.", action)
-        LOGGER.info("Amount = %s.", amount)
         if action == "bake":
+            LOGGER.info("Amount = %s.", amount)
             self._make_bake(context, amount, from_key)
         elif action == "eat":
+            LOGGER.info("Amount = %s.", amount)
             self._make_eat(context, amount, from_key)
         elif action == "find":
+            LOGGER.info("Amount = %s.", amount)   
             LOGGER.info("Query ID = %s.", qid)
             self._make_find(context, amount, qid, from_key)
         elif action == "interested":
+            LOGGER.info("Amount = %s.", amount)        
             LOGGER.info("Query ID = %s.", qid)
             LOGGER.info("status = %s.", status)
             LOGGER.info("ds1 = %s.", ds1)
