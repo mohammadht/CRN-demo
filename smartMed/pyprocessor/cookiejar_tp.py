@@ -243,7 +243,7 @@ class CookieJarTransactionHandler(TransactionHandler):
         LOGGER.info('Got the key %s and the cookiejar address %s.',
                     from_key, query_address)
         state_entries = context.get_state([query_address])
-        qid, ds1, ds2, ds3, ds4, ds5 = state_entries.data           
+        qid, ds1, ds2, ds3, ds4, ds5 = state_entries           
         if status == "yes":
             status = "inetersted"
         else:
