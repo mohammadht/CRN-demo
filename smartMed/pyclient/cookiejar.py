@@ -171,7 +171,7 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
         setup_loggers(verbose_level=verbose_level)
 
         # Get the commands from cli args and call corresponding handlers
-        elif args.command == 'find':
+        if args.command == 'find':
             do_find(args)
         elif args.command == 'interested':
             do_interested(args)
