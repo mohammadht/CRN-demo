@@ -74,12 +74,6 @@ def create_parser(prog_name):
     subparsers = parser.add_subparsers(title='subcommands', dest='command')
     subparsers.required = True
 
-    bake_subparser = subparsers.add_parser('bake',
-                                           help='bake some cookies',
-                                           parents=[parent_parser])
-    bake_subparser.add_argument('amount',
-                                type=int,
-                                help='the number of cookies to bake')
     find_subparser = subparsers.add_parser('find',
                                            help='find the list of DSs with color tag',
                                            parents=[parent_parser])                                           
@@ -109,22 +103,7 @@ def create_parser(prog_name):
                                           parents=[parent_parser])
     delete_subparser.add_argument('qid',
                                type=int,
-                               help='Query ID of the one that is going to be deleted')                                                                                                                                                                                                                                      
-    eat_subparser = subparsers.add_parser('eat',
-                                          help='eat some cookies',
-                                          parents=[parent_parser])
-    eat_subparser.add_argument('amount',
-                               type=int,
-                               help='the number of cookies to eat')
-    subparsers.add_parser('count',
-                          help='show number of cookies in ' +
-                          'the cookie jar',
-                          parents=[parent_parser])
-						  
-    clear_subparser = subparsers.add_parser('clear',
-                                           help='empties cookie jar',
-                                           parents=[parent_parser])					  
-						  
+                               help='Query ID of the one that is going to be deleted')                                                                                                                                                                                                                                      			  
     return parser
 
 def _get_private_keyfile(key_name):
@@ -132,13 +111,6 @@ def _get_private_keyfile(key_name):
     home = os.path.expanduser("~")
     key_dir = os.path.join(home, ".sawtooth", "keys")
     return '{}/{}.priv'.format(key_dir, key_name)
-
-def do_bake(args):
-    '''Subcommand to bake cookies.  Calls client class to do the baking.'''
-    privkeyfile = _get_private_keyfile(KEY_NAME)
-    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
-    response = client.bake(args.amount)
-    print("Bake Response: {}".format(response))
 
 def do_find(args):
     '''Subcommand to find a list of DSs with associated color. Calls client class to do the finding.'''
@@ -180,13 +152,6 @@ def do_list():
     else:
         raise Exception("Transaction data not found")            
 
-def do_eat(args):
-    '''Subcommand to eat cookies.  Calls client class to do the eating.'''
-    privkeyfile = _get_private_keyfile(KEY_NAME)
-    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
-    response = client.eat(args.amount)
-    print("Eat Response: {}".format(response))
-
 def do_delete(args):
     '''Subcommand to delete a query.  Calls client class to do the deleting.'''
     privkeyfile = _get_private_keyfile(KEY_NAME)
@@ -194,22 +159,6 @@ def do_delete(args):
     response = client.delete(args.qid)
     print("delete Response: {}".format(response))    
 
-def do_count():
-    '''Subcommand to count cookies.  Calls client class to do the counting.'''
-    privkeyfile = _get_private_keyfile(KEY_NAME)
-    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
-    data = client.count()
-    if data is not None:
-        print("\nThe cookie jar has {} cookies.\n".format(data.decode()))
-    else:
-        raise Exception("Cookie jar data not found")
-		
-def do_clear():
-    '''Subcommand to empty cookie jar. Calls client class to do the clearing.'''
-    privkeyfile = _get_private_keyfile(KEY_NAME)
-    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
-    response = client.clear()
-    print("Clear Response: {}".format(response))
 
 def main(prog_name=os.path.basename(sys.argv[0]), args=None):
     '''Entry point function for the client CLI.'''
@@ -222,10 +171,6 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
         setup_loggers(verbose_level=verbose_level)
 
         # Get the commands from cli args and call corresponding handlers
-        if args.command == 'bake':
-            do_bake(args)
-        elif args.command == 'eat':
-            do_eat(args)
         elif args.command == 'find':
             do_find(args)
         elif args.command == 'interested':
@@ -233,11 +178,7 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
         elif args.command == 'delete':
             do_delete(args)        
         elif args.command == 'list':
-            do_list()                   
-        elif args.command == 'count':
-            do_count()
-        elif args.command == 'clear':
-            do_clear()	
+            do_list()                   	
         else:
             raise Exception("Invalid command: {}".format(args.command))
 

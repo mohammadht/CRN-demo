@@ -115,14 +115,7 @@ class CookieJarTransactionHandler(TransactionHandler):
         from_key = header.signer_public_key
 
         # Perform the action.
-        LOGGER.info("Action = %s.", action)
-        if action == "bake":
-            LOGGER.info("Amount = %s.", amount)
-            self._make_bake(context, amount, from_key)
-        elif action == "eat":
-            LOGGER.info("Amount = %s.", amount)
-            self._make_eat(context, amount, from_key)
-        elif action == "find":
+        if action == "find":
             LOGGER.info("Amount = %s.", amount)   
             LOGGER.info("Query ID = %s.", qid)
             self._make_find(context, amount, qid, from_key)
@@ -139,73 +132,8 @@ class CookieJarTransactionHandler(TransactionHandler):
         elif action == "delete":
             LOGGER.info("Query ID = %s.", qid)
             self._make_delete(context, qid, from_key)
-        elif action == "clear":
-            self._empty_cookie_jar(context, amount, from_key)
         else:
             LOGGER.info("Unhandled action. Action should be bake or eat")
-
-    @classmethod
-    def _make_bake(cls, context, amount, from_key):
-        '''Bake (add) "amount" cookies.'''
-        cookiejar_address = _get_cookiejar_address(from_key,"bake_add")
-        LOGGER.info('Got the key %s and the cookiejar address %s.',
-                    from_key, cookiejar_address)
-        state_entries = context.get_state([cookiejar_address])
-        new_count = 0
-
-        if state_entries == []:
-            LOGGER.info('No previous cookies, creating new cookie jar %s.',
-                        from_key)
-            new_count = int(amount)
-        else:
-            try:
-                count = int(state_entries[0].data)
-            except:
-                raise InternalError('Failed to load state data')
-            new_count = int(amount) + int(count)
-
-        state_data = str(new_count).encode('utf-8')
-        addresses = context.set_state({cookiejar_address: state_data})
-
-        if len(addresses) < 1:
-            raise InternalError("State Error")
-        context.add_event(
-            event_type="cookiejar/bake",
-            attributes=[("cookies-baked", amount)])
-
-    @classmethod
-    def _make_eat(cls, context, amount, from_key):
-        '''Eat (subtract) "amount" cookies.'''
-        cookiejar_address = _get_cookiejar_address(from_key)
-        LOGGER.info('Got the key %s and the cookiejar address %s.',
-                    from_key, cookiejar_address)
-
-        state_entries = context.get_state([cookiejar_address])
-        new_count = 0
-
-        if state_entries == []:
-            LOGGER.info('No cookie jar with the key %s.', from_key)
-        else:
-            try:
-                count = int(state_entries[0].data)
-            except:
-                raise InternalError('Failed to load state data')
-            if count < int(amount):
-                raise InvalidTransaction('Not enough cookies to eat. '
-                                         'The number should be <= %s.', count)
-            else:
-                new_count = count - int(amount)
-
-        LOGGER.info('Eating %s cookies out of %d.', amount, count)
-        state_data = str(new_count).encode('utf-8')
-        addresses = context.set_state(
-            {_get_cookiejar_address(from_key): state_data})
-
-        if len(addresses) < 1:
-            raise InternalError("State Error")
-        context.add_event(
-            event_type="cookiejar/eat",
-            attributes=[("cookies-ate", amount)])
 
     @classmethod
     def _make_find(cls, context, amount, qid, from_key):
@@ -266,23 +194,6 @@ class CookieJarTransactionHandler(TransactionHandler):
         context.add_event(
             event_type="cookiejar/bake",
             attributes=[("cookies-baked", amount)])    
-
-    @classmethod
-    def _empty_cookie_jar(cls, context, amount, from_key):
-        cookie_jar_address = _get_cookiejar_address(from_key)
-        LOGGER.info("fetched key %s and state address %s", from_key, cookie_jar_address)
-        state_entries = context.get_state([cookie_jar_address])
-        if state_entries == []:
-            LOGGER.info('No cookie jar with the key %s.', from_key)
-            return
-        else:
-            state_data = str(0).encode('utf-8')
-            addresses = context.set_state(
-                {cookie_jar_address: state_data})
-
-        if len(addresses) < 1:
-            raise InternalError("State update Error")
-        LOGGER.info("SET global state success")
 
     @classmethod
     def _make_delete(cls, context, qid, from_key):

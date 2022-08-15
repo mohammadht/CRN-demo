@@ -91,17 +91,6 @@ class CookieJarClient(object):
     # 1. Do any additional handling, if required
     # 2. Create a transaction and a batch
     # 2. Send to REST API
-    def bake(self, amount):
-        '''Bake amount cookies for the cookie jar.'''
-        return self._wrap_and_send("bake", amount, None, None, None, None, None, None, None, wait=10)
-
-    def eat(self, amount):
-        '''Eat amount cookies from the cookie jar.'''
-        try:
-            ret_amount = self._wrap_and_send("eat", amount, None, None, None, None, None, None, None, wait=10)
-        except Exception:
-            raise Exception('Encountered an error during eat')
-        return ret_amount
 
     def find(self, color, qid):
         '''find associated DSs with the color tag.'''
@@ -110,7 +99,6 @@ class CookieJarClient(object):
     def delete(self, qid):
         '''delete a registered query.'''
         return self._wrap_and_send("delete", None, qid, None, None, None, None, None, None, wait=10)
-
 
     def get_query(self, qid):
         '''Get a query registered in the ledger by its ID'''
@@ -140,23 +128,6 @@ class CookieJarClient(object):
 
         except BaseException:
             return None    
-
-    def count(self):
-        '''Count the number of cookies in the cookie jar.'''
-        address = self._get_address("bake_add")
-        result = self._send_to_rest_api("state/{}".format(address))
-        try:
-            return base64.b64decode(yaml.safe_load(result)["data"])
-        except BaseException:
-            return None
-			
-    def clear(self):
-        '''Empty the cookie jar.'''
-        try:
-            ret_amount = self._wrap_and_send("clear", 0, wait=10)
-        except Exception:
-            raise Exception('Encountered an error during clear')
-        return ret_amount
 
     def _send_to_rest_api(self, suffix, data=None, content_type=None):
         '''Send a REST command to the Validator via the REST API.
@@ -227,13 +198,7 @@ class CookieJarClient(object):
             address = self._get_address(str(qid))
         elif action == "delete":    
             raw_payload = ",".join([action, str(qid)])
-            address = self._get_address(str(qid))         
-        elif action == "bake":    
-            raw_payload = ",".join([action, str(amount)])
-            address = self._get_address("bake_add")    
-        elif action == "eat":    
-            raw_payload = ",".join([action, str(amount)]) 
-            address = self._get_address("bake_add")   
+            address = self._get_address(str(qid))           
         payload = raw_payload.encode() # Convert Unicode to bytes
 
         # Construct the address where we'll store our state.
