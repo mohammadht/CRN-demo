@@ -258,7 +258,7 @@ class CookieJarTransactionHandler(TransactionHandler):
             query_result = qid, ds1, ds2, ds3, status, ds5
         if amount == "ds5":
             query_result = qid, ds1, ds2, ds3, ds4, status                
-        state_data = query_result.join(',').encode('utf-8')
+        state_data = str(query_result).encode('utf-8')
         addresses = context.set_state({query_address: state_data})
 
         if len(addresses) < 1:
