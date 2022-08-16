@@ -15,8 +15,8 @@
 # limitations under the License.
 # ------------------------------------------------------------------------------
 '''
-Command line interface for cookiejar TF.
-Parses command line arguments and passes to the CookieJarClient class
+Command line interface for smartmed TF.
+Parses command line arguments and passes to the smartmedClient class
 to process.
 '''
 
@@ -27,9 +27,9 @@ import sys
 import traceback
 
 from colorlog import ColoredFormatter
-from cookiejar_client import CookieJarClient
+from smartmed_client import smartmedClient
 
-KEY_NAME = 'mycookiejar'
+KEY_NAME = 'mysmartmed'
 
 # hard-coded for simplicity (otherwise get the URL from the args in main):
 DEFAULT_URL = 'http://localhost:8008'
@@ -64,7 +64,7 @@ def setup_loggers(verbose_level):
     logger.addHandler(create_console_handler(verbose_level))
 
 def create_parser(prog_name):
-    '''Create the command line argument parser for the cookiejar CLI.'''
+    '''Create the command line argument parser for the smartmed CLI.'''
     parent_parser = argparse.ArgumentParser(prog=prog_name, add_help=False)
 
     parser = argparse.ArgumentParser(
@@ -115,14 +115,14 @@ def _get_private_keyfile(key_name):
 def do_find(args):
     '''Subcommand to find a list of DSs with associated color. Calls client class to do the finding.'''
     privkeyfile = _get_private_keyfile(KEY_NAME)
-    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
+    client = smartmedClient(base_url=DEFAULT_URL, key_file=privkeyfile)
     response = client.find(args.color,args.qid)
     print("Find Response: {}".format(response))
 
 def do_interested(args):
     '''Subcommand to show the interest of the DS to a query. Calls client class to do the interest.'''
     privkeyfile = _get_private_keyfile(KEY_NAME)
-    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
+    client = smartmedClient(base_url=DEFAULT_URL, key_file=privkeyfile)
     data = client.get_query(args.qid)
     if data is not None:
         qid, ds1, ds2, ds3, ds4, ds5 = data.decode().split(",")
@@ -132,7 +132,7 @@ def do_interested(args):
 def do_list():
     '''Subcommand to show the list of query results.  Calls client class to do the showing.'''
     privkeyfile = _get_private_keyfile(KEY_NAME)
-    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
+    client = smartmedClient(base_url=DEFAULT_URL, key_file=privkeyfile)
     query_list = [
         tx.split(',')
         for txs in client.list()
@@ -155,7 +155,7 @@ def do_list():
 def do_delete(args):
     '''Subcommand to delete a query.  Calls client class to do the deleting.'''
     privkeyfile = _get_private_keyfile(KEY_NAME)
-    client = CookieJarClient(base_url=DEFAULT_URL, key_file=privkeyfile)
+    client = smartmedClient(base_url=DEFAULT_URL, key_file=privkeyfile)
     response = client.delete(args.qid)
     print("delete Response: {}".format(response))    
 

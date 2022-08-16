@@ -13,7 +13,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------------------
 '''
-CookieJarClient class interfaces with Sawtooth through the REST API.
+smartmedClient class interfaces with Sawtooth through the REST API.
 It accepts input from a client CLI/GUI/BUI or other interface.
 '''
 
@@ -36,14 +36,14 @@ from sawtooth_sdk.protobuf.batch_pb2 import BatchHeader
 from sawtooth_sdk.protobuf.batch_pb2 import Batch
 
 # The Transaction Family Name
-FAMILY_NAME = 'cookiejar'
-# TF Prefix is first 6 characters of SHA-512("cookiejar"), a4d219
+FAMILY_NAME = 'smartmed'
+# TF Prefix is first 6 characters of SHA-512("smartmed"), a4d219
 
 def _hash(data):
     return hashlib.sha512(data).hexdigest()
 
-class CookieJarClient(object):
-    '''Client Cookie Jar class
+class smartmedClient(object):
+    '''Client smartmed class
 
     Supports "find", "sendlist", "delete", "eat", and "count" functions.
     '''
@@ -77,7 +77,7 @@ class CookieJarClient(object):
             .new_signer(private_key)
         self._public_key = self._signer.get_public_key().as_hex()
 
-        # Address is 6-char TF prefix + hash of "mycookiejar"'s public key
+        # Address is 6-char TF prefix + hash of "mysmartmed"'s public key
 
     def _get_prefix(self):
         return _hash(FAMILY_NAME.encode('utf-8'))[0:6]

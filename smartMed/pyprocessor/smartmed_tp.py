@@ -13,7 +13,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------------------
 '''
-CookieJarTransactionHandler class interfaces for cookiejar Transaction Family.
+smartmedTransactionHandler class interfaces for smartmed Transaction Family.
 '''
 
 import traceback
@@ -36,27 +36,27 @@ DEFAULT_URL = 'tcp://localhost:4004'
 
 LOGGER = logging.getLogger(__name__)
 
-FAMILY_NAME = "cookiejar"
-# TF Prefix is first 6 characters of SHA-512("cookiejar"), a4d219
+FAMILY_NAME = "smartmed"
+# TF Prefix is first 6 characters of SHA-512("smartmed"), a4d219
 
 def _hash(data):
     '''Compute the SHA-512 hash and return the result as hex characters.'''
     return hashlib.sha512(data).hexdigest()
 
-def _get_cookiejar_address(from_key,query):
+def _get_smartmed_address(from_key,query):
     '''
-    Return the address of a cookiejar object from the cookiejar TF.
+    Return the address of a smartmed object from the smartmed TF.
 
     The address is the first 6 hex characters from the hash SHA-512(TF name),
-    plus the result of the hash SHA-512(cookiejar public key).
+    plus the result of the hash SHA-512(smartmed public key).
     '''
     return _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
                  _hash(from_key.encode('utf-8'))[0:32] + _hash(query.encode('utf-8'))[0:32]
 
 
-class CookieJarTransactionHandler(TransactionHandler):
+class smartmedTransactionHandler(TransactionHandler):
     '''
-    Transaction Processor class for the cookiejar Transaction Family.
+    Transaction Processor class for the smartmed Transaction Family.
 
     This TP communicates with the Validator using the accept/get/set functions.
     This implements functions to "find", "bake" or "eat" cookies in a cookie jar.
@@ -64,7 +64,7 @@ class CookieJarTransactionHandler(TransactionHandler):
     def __init__(self, namespace_prefix):
         '''Initialize the transaction handler class.
 
-           This is setting the "cookiejar" TF namespace prefix.
+           This is setting the "smartmed" TF namespace prefix.
         '''
         self._namespace_prefix = namespace_prefix
 
@@ -87,10 +87,10 @@ class CookieJarTransactionHandler(TransactionHandler):
         '''This implements the apply function for the TransactionHandler class.
 
            The apply function does most of the work for this class by
-           processing a transaction for the cookiejar transaction family.
+           processing a transaction for the smartmed transaction family.
         '''
 
-        # Get the payload and extract the cookiejar-specific information.
+        # Get the payload and extract the smartmed-specific information.
         # It has already been converted from Base64, but needs deserializing.
         # It was serialized with CSV: action, value
         header = transaction.header
@@ -138,7 +138,7 @@ class CookieJarTransactionHandler(TransactionHandler):
     @classmethod
     def _make_find(cls, context, amount, qid, from_key):
         '''find associated dsc from a specific dc based on the color tag.'''
-        query_address = _get_cookiejar_address(from_key,qid)
+        query_address = _get_smartmed_address(from_key,qid)
         LOGGER.info('Got the key %s and the query address %s.',
                     from_key, query_address)
         query_result = [qid,"n/a","n/a","n/a","n/a","n/a"]
@@ -167,8 +167,8 @@ class CookieJarTransactionHandler(TransactionHandler):
 
     def _make_interested(cls, context, amount, qid, status, ds1, ds2, ds3, ds4, ds5, from_key):
         '''Register the interest of a DS to a query.'''
-        query_address = _get_cookiejar_address(from_key,qid)
-        LOGGER.info('Got the key %s and the cookiejar address %s.',
+        query_address = _get_smartmed_address(from_key,qid)
+        LOGGER.info('Got the key %s and the smartmed address %s.',
                     from_key, query_address)
         state_entries = context.get_state([query_address])
         qid, ds1, ds2, ds3, ds4, ds5 = state_entries[0].data.decode().split(',')        
@@ -192,18 +192,18 @@ class CookieJarTransactionHandler(TransactionHandler):
         if len(addresses) < 1:
             raise InternalError("State Error")
         context.add_event(
-            event_type="cookiejar/bake",
+            event_type="smartmed/bake",
             attributes=[("cookies-baked", amount)])    
 
     @classmethod
     def _make_delete(cls, context, qid, from_key):
-        query_address = _get_cookiejar_address(from_key,qid)
+        query_address = _get_smartmed_address(from_key,qid)
         LOGGER.info('Got the key %s and the query address %s.',
                     from_key, query_address)
         context.delete_state([query_address])    
 
 def main():
-    '''Entry-point function for the cookiejar Transaction Processor.'''
+    '''Entry-point function for the smartmed Transaction Processor.'''
     try:
         # Setup logging for this class.
         logging.basicConfig()
@@ -212,7 +212,7 @@ def main():
         # Register the Transaction Handler and start it.
         processor = TransactionProcessor(url=DEFAULT_URL)
         sw_namespace = _hash(FAMILY_NAME.encode('utf-8'))[0:6]
-        handler = CookieJarTransactionHandler(sw_namespace)
+        handler = smartmedTransactionHandler(sw_namespace)
         processor.add_handler(handler)
         processor.start()
     except KeyboardInterrupt:
