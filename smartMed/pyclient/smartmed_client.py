@@ -45,7 +45,7 @@ def _hash(data):
 class smartmedClient(object):
     '''Client smartmed class
 
-    Supports "find", "sendlist", "delete", "eat", and "count" functions.
+    Supports "find", "list", "delete", and "interested" functions.
     '''
 
     def __init__(self, base_url, key_file=None):
@@ -132,8 +132,8 @@ class smartmedClient(object):
     def _send_to_rest_api(self, suffix, data=None, content_type=None):
         '''Send a REST command to the Validator via the REST API.
 
-           Called by count() &  _wrap_and_send().
-           The latter caller is made on the behalf of find(), bake() & eat().
+           Called by list() &  _wrap_and_send().
+           The latter caller is made on the behalf of find(), interested(), and delete() .
         '''
         url = "{}/{}".format(self._base_url, suffix)
         print("URL to send to REST API is {}".format(url))
@@ -186,7 +186,7 @@ class smartmedClient(object):
         '''Create a transaction, then wrap it in a batch.
 
            Even single transactions must be wrapped into a batch.
-           Called by find() and interested(). 
+           Called by find(), interested(), and delete(). 
         '''
 
         # Generate a CSV UTF-8 encoded string as the payload.

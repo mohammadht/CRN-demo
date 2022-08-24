@@ -68,7 +68,7 @@ def create_parser(prog_name):
     parent_parser = argparse.ArgumentParser(prog=prog_name, add_help=False)
 
     parser = argparse.ArgumentParser(
-        description='Provides subcommands to manage your simple cookie baker',
+        description='Provides subcommands to manage your queries',
         parents=[parent_parser])
 
     subparsers = parser.add_subparsers(title='subcommands', dest='command')
@@ -97,7 +97,7 @@ def create_parser(prog_name):
                                 help='the ID of the query needed to be answered')
     interested_subparser.add_argument('status',
                                 type=str,
-                                help='YES/NO response from the DS')
+                                help='yes/no response from the DS')
     delete_subparser = subparsers.add_parser('delete',
                                           help='delete a registered query',
                                           parents=[parent_parser])

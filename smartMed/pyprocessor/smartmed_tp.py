@@ -33,7 +33,7 @@ from sawtooth_sdk.processor.core import TransactionProcessor
 DEFAULT_URL = 'tcp://localhost:4004'
 # For Docker:
 #DEFAULT_URL = 'tcp://validator:4004'
-
+ 
 LOGGER = logging.getLogger(__name__)
 
 FAMILY_NAME = "smartmed"
@@ -58,8 +58,8 @@ class smartmedTransactionHandler(TransactionHandler):
     '''
     Transaction Processor class for the smartmed Transaction Family.
 
-    This TP communicates with the Validator using the accept/get/set functions.
-    This implements functions to "find", "bake" or "eat" cookies in a cookie jar.
+    This TP communicates with the Validator using the accept/get/set functions
+    This implements functions to "find".
     '''
     def __init__(self, namespace_prefix):
         '''Initialize the transaction handler class.
