@@ -100,7 +100,7 @@ class smartmedTransactionHandler(TransactionHandler):
             amount = payload_list[1]
             qid = payload_list[2]
         elif action == "interested":
-            amount = payload_list[1]
+            username = payload_list[1]
             qid = payload_list[2]
             status = payload_list[3]
             ds1 = payload_list[4]
@@ -120,7 +120,7 @@ class smartmedTransactionHandler(TransactionHandler):
             LOGGER.info("Query ID = %s.", qid)
             self._make_find(context, amount, qid, from_key)
         elif action == "interested":
-            LOGGER.info("Amount = %s.", amount)        
+            LOGGER.info("Username = %s.", username)        
             LOGGER.info("Query ID = %s.", qid)
             LOGGER.info("status = %s.", status)
             LOGGER.info("ds1 = %s.", ds1)
@@ -128,7 +128,7 @@ class smartmedTransactionHandler(TransactionHandler):
             LOGGER.info("ds3 = %s.", ds3)
             LOGGER.info("ds4 = %s.", ds4)
             LOGGER.info("ds5 = %s.", ds5)
-            self._make_interested(context, amount, qid, status, ds1, ds2, ds3, ds4, ds5, from_key)            
+            self._make_interested(context, username, qid, status, ds1, ds2, ds3, ds4, ds5, from_key)            
         elif action == "delete":
             LOGGER.info("Query ID = %s.", qid)
             self._make_delete(context, qid, from_key)
@@ -165,7 +165,7 @@ class smartmedTransactionHandler(TransactionHandler):
         state_data = str(query_result).encode('utf-8')
         addresses = context.set_state({query_address: state_data})
 
-    def _make_interested(cls, context, amount, qid, status, ds1, ds2, ds3, ds4, ds5, from_key):
+    def _make_interested(cls, context, username, qid, status, ds1, ds2, ds3, ds4, ds5, from_key):
         '''Register the interest of a DS to a query.'''
         query_address = _get_smartmed_address(from_key,qid)
         LOGGER.info('Got the key %s and the smartmed address %s.',
@@ -176,15 +176,15 @@ class smartmedTransactionHandler(TransactionHandler):
             status = "inetersted"
         else:
             status = "not interested"    
-        if amount == "ds1":
+        if username == "ds1":
             query_result = qid, status, ds2, ds3, ds4, ds5
-        if amount == "ds2":
+        if username == "ds2":
             query_result = qid, ds1, status, ds3, ds4, ds5
-        if amount == "ds3":
+        if username == "ds3":
             query_result = qid, ds1, ds2, status, ds4, ds5
-        if amount == "ds4":
+        if username == "ds4":
             query_result = qid, ds1, ds2, ds3, status, ds5
-        if amount == "ds5":
+        if username == "ds5":
             query_result = qid, ds1, ds2, ds3, ds4, status                
         state_data = str(query_result).encode('utf-8')
         addresses = context.set_state({query_address: state_data})
@@ -193,7 +193,7 @@ class smartmedTransactionHandler(TransactionHandler):
             raise InternalError("State Error")
         context.add_event(
             event_type="smartmed/bake",
-            attributes=[("cookies-baked", amount)])    
+            attributes=[("cookies-baked", username)])    
 
     @classmethod
     def _make_delete(cls, context, qid, from_key):

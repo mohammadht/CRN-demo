@@ -89,7 +89,7 @@ def create_parser(prog_name):
     interested_subparser = subparsers.add_parser('interested',
                                            help='The DS shows its interest to the query',
                                            parents=[parent_parser])
-    interested_subparser.add_argument('--dsid',
+    interested_subparser.add_argument('--username',
                                 type=str,
                                 help='the ID of the DS that is going to answer the query')
     interested_subparser.add_argument('--qid',
@@ -121,12 +121,12 @@ def do_find(args):
 
 def do_interested(args):
     '''Subcommand to show the interest of the DS to a query. Calls client class to do the interest.'''
-    privkeyfile = _get_private_keyfile(KEY_NAME)
+    privkeyfile = _get_private_keyfile(args.username)
     client = smartmedClient(base_url=DEFAULT_URL, key_file=privkeyfile)
     data = client.get_query(args.qid)
     if data is not None:
         qid, ds1, ds2, ds3, ds4, ds5 = data.decode().split(",")
-    response = client.interested(args.dsid,args.qid,args.status,ds1,ds2,ds3,ds4,ds5)
+    response = client.interested(args.username,args.qid,args.status,ds1,ds2,ds3,ds4,ds5)
     print("Find Response: {}".format(response))    
 
 def do_list():

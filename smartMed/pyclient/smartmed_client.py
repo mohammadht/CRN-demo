@@ -109,9 +109,9 @@ class smartmedClient(object):
         except BaseException:
             return None    
 
-    def interested(self, dsid, qid, status, ds1, ds2, ds3, ds4, ds5):
+    def interested(self, username, qid, status, ds1, ds2, ds3, ds4, ds5):
         '''submit if the associated DS is interested in the query or not.'''
-        return self._wrap_and_send("interested", dsid, qid, status, ds1, ds2, ds3, ds4, ds5, wait=10)    
+        return self._wrap_and_send("interested", username, qid, status, ds1, ds2, ds3, ds4, ds5, wait=10)    
 
     def list(self):
         addr_prefix = self._get_prefix()
