@@ -51,7 +51,7 @@ def _get_smartmed_address(from_key,query):
     plus the result of the hash SHA-512(smartmed public key).
     '''
     return _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
-                 _hash(from_key.encode('utf-8'))[0:32] + _hash(query.encode('utf-8'))[0:32]
+                 _hash(query.encode('utf-8'))[0:64]
 
 
 class smartmedTransactionHandler(TransactionHandler):
