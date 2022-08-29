@@ -121,7 +121,7 @@ def do_find(args):
 
 def do_interested(args):
     '''Subcommand to show the interest of the DS to a query. Calls client class to do the interest.'''
-    privkeyfile = _get_private_keyfile(args.username)
+    privkeyfile = _get_private_keyfile(KEY_NAME)
     client = smartmedClient(base_url=DEFAULT_URL, key_file=privkeyfile)
     data = client.get_query(args.qid)
     if data is not None:
